@@ -20,7 +20,7 @@ describe('Game Logic', () => {
   describe('createInitialState', () => {
     it('creates initial state with correct defaults for pass-through mode', () => {
       const state = createInitialState('pass-through');
-      
+
       expect(state.mode).toBe('pass-through');
       expect(state.status).toBe('idle');
       expect(state.score).toBe(0);
@@ -31,7 +31,7 @@ describe('Game Logic', () => {
 
     it('creates initial state with correct defaults for walls mode', () => {
       const state = createInitialState('walls');
-      
+
       expect(state.mode).toBe('walls');
       expect(state.status).toBe('idle');
     });
@@ -40,7 +40,7 @@ describe('Game Logic', () => {
       const state = createInitialState('pass-through');
       const centerX = Math.floor(GRID_SIZE / 2);
       const centerY = Math.floor(GRID_SIZE / 2);
-      
+
       expect(state.snake[0].x).toBe(centerX);
       expect(state.snake[0].y).toBe(centerY);
     });
@@ -53,7 +53,7 @@ describe('Game Logic', () => {
         { x: 6, y: 5 },
         { x: 7, y: 5 },
       ];
-      
+
       // Generate multiple times to verify randomness doesn't hit snake
       for (let i = 0; i < 100; i++) {
         const food = generateFood(snake);
@@ -64,7 +64,7 @@ describe('Game Logic', () => {
 
     it('generates food within grid bounds', () => {
       const snake: Position[] = [{ x: 0, y: 0 }];
-      
+
       for (let i = 0; i < 100; i++) {
         const food = generateFood(snake);
         expect(food.x).toBeGreaterThanOrEqual(0);
@@ -207,7 +207,7 @@ describe('Game Logic', () => {
     it('moves snake forward in current direction', () => {
       const state = createPlayingState('pass-through');
       const newState = moveSnake(state);
-      
+
       expect(newState.snake[0]).toEqual({ x: 9, y: 10 });
       expect(newState.snake.length).toBe(3);
       expect(newState.status).toBe('playing');
@@ -218,9 +218,9 @@ describe('Game Logic', () => {
         ...createPlayingState('pass-through'),
         food: { x: 9, y: 10 }, // Food right in front of head
       };
-      
+
       const newState = moveSnake(state);
-      
+
       expect(newState.snake.length).toBe(4);
       expect(newState.score).toBe(10);
       expect(newState.food).not.toEqual({ x: 9, y: 10 }); // New food generated
@@ -236,7 +236,7 @@ describe('Game Logic', () => {
         ],
         direction: 'LEFT',
       };
-      
+
       const newState = moveSnake(state);
       expect(newState.status).toBe('game-over');
     });
@@ -251,7 +251,7 @@ describe('Game Logic', () => {
         ],
         direction: 'LEFT',
       };
-      
+
       const newState = moveSnake(state);
       expect(newState.snake[0]).toEqual({ x: GRID_SIZE - 1, y: 10 });
       expect(newState.status).toBe('playing');
@@ -268,9 +268,9 @@ describe('Game Logic', () => {
           { x: 9, y: 11 },
           { x: 9, y: 10 }, // Will collide when moving left
         ],
-        direction: 'LEFT',
+        direction: 'DOWN', // Will collide with (10, 11) which is a body segment
       };
-      
+
       const newState = moveSnake(state);
       expect(newState.status).toBe('game-over');
     });
@@ -299,7 +299,7 @@ describe('Game Logic', () => {
     it('calculates final score correctly', () => {
       const passState: GameState = { ...createInitialState('pass-through'), score: 100 };
       const wallsState: GameState = { ...createInitialState('walls'), score: 100 };
-      
+
       expect(getFinalScore(passState)).toBe(100);
       expect(getFinalScore(wallsState)).toBe(150);
     });

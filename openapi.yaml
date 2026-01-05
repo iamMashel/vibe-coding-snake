@@ -1,0 +1,446 @@
+openapi: 3.0.0
+info:
+  title: Vibe Coding Snake Game API
+  description: Backend API for the Vibe Coding Snake Game
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        avatarUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - username
+        - email
+        - createdAt
+
+    LoginCredentials:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    SignupCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - username
+        - email
+        - password
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        rank:
+          type: integer
+        username:
+          type: string
+        score:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
+        playedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rank
+        - username
+        - score
+        - mode
+        - playedAt
+
+    GameMode:
+      type: string
+      enum:
+        - pass-through
+        - walls
+
+    GameStatus:
+      type: string
+      enum:
+        - idle
+        - playing
+        - paused
+        - game-over
+
+    Direction:
+      type: string
+      enum:
+        - UP
+        - DOWN
+        - LEFT
+        - RIGHT
+
+    Position:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+      required:
+        - x
+        - y
+
+    GameState:
+      type: object
+      properties:
+        snake:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+        food:
+          $ref: '#/components/schemas/Position'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        score:
+          type: integer
+        status:
+          $ref: '#/components/schemas/GameStatus'
+        mode:
+          $ref: '#/components/schemas/GameMode'
+        speed:
+          type: integer
+      required:
+        - snake
+        - food
+        - direction
+        - score
+        - status
+        - mode
+        - speed
+
+    ActivePlayer:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        score:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
+        gameState:
+          $ref: '#/components/schemas/GameState'
+        viewers:
+          type: integer
+      required:
+        - id
+        - username
+        - score
+        - mode
+        - gameState
+        - viewers
+
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          nullable: true
+        error:
+          type: string
+      required:
+        - success
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: snake_game_session
+
+security:
+  - cookieAuth: []
+
+paths:
+  # Auth Routes
+  /auth/login:
+    post:
+      summary: Login user
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginCredentials'
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        401:
+          description: Invalid credentials
+
+  /auth/signup:
+    post:
+      summary: Register new user
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupCredentials'
+      responses:
+        201:
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        400:
+          description: Validation error
+
+  /auth/logout:
+    post:
+      summary: Logout user
+      tags: [Auth]
+      responses:
+        200:
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/session:
+    get:
+      summary: Get current session
+      tags: [Auth]
+      responses:
+        200:
+          description: Current user session
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+                    nullable: true
+
+  # Leaderboard Routes
+  /leaderboard:
+    get:
+      summary: Get leaderboard entries
+      tags: [Leaderboard]
+      parameters:
+        - in: query
+          name: mode
+          schema:
+            $ref: '#/components/schemas/GameMode'
+          required: false
+      responses:
+        200:
+          description: List of leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LeaderboardEntry'
+
+    post:
+      summary: Submit a score
+      tags: [Leaderboard]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                score:
+                  type: integer
+                mode:
+                  $ref: '#/components/schemas/GameMode'
+                username:
+                  type: string
+              required:
+                - score
+                - mode
+                - username
+      responses:
+        200:
+          description: Score submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LeaderboardEntry'
+
+  # Spectator Routes
+  /spectator/active:
+    get:
+      summary: Get active players
+      tags: [Spectator]
+      responses:
+        200:
+          description: List of active players
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActivePlayer'
+
+  /spectator/watch/{playerId}:
+    post:
+      summary: Watch a player
+      tags: [Spectator]
+      parameters:
+        - in: path
+          name: playerId
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Started watching player
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ActivePlayer'
+        404:
+          description: Player not found
+
+  /spectator/stop/{playerId}:
+    post:
+      summary: Stop watching a player
+      tags: [Spectator]
+      parameters:
+        - in: path
+          name: playerId
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Stopped watching
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # Game Routes
+  /game/save:
+    post:
+      summary: Save game state
+      tags: [Game]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gameState:
+                  $ref: '#/components/schemas/GameState'
+                userId:
+                  type: string
+              required:
+                - gameState
+                - userId
+      responses:
+        200:
+          description: Game saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /game/load/{userId}:
+    get:
+      summary: Load saved game
+      tags: [Game]
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Game loaded
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GameState'
+                    nullable: true
