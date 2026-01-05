@@ -38,24 +38,23 @@ npm install
 
 ## Running the Application
 
-### Option 1: Using Make (Backend)
+### Quick Start (Recommended)
+Run both frontend and backend with a single command:
 ```bash
-# Terminal 1 - Backend
-cd backend
-make dev
-
-# Terminal 2 - Frontend
-cd frontend
 npm run dev
 ```
 
-### Option 2: Manual Commands
-```bash
-# Terminal 1 - Backend
-cd backend
-uv run uvicorn main:app --reload
+### Individual Commands
+If you prefer to run them separately:
 
-# Terminal 2 - Frontend
+#### Backend
+```bash
+cd backend
+make dev
+```
+
+#### Frontend
+```bash
 cd frontend
 npm run dev
 ```
