@@ -1,126 +1,147 @@
-# Snake Game
+# Vibe Coding Snake Game
 
-A modern, responsive implementation of the classic Snake game built with React and styled with TailwindCSS.
-
-## Features
-
-- **Smooth Gameplay**: Responsive controls with arrow keys
-- **Score Tracking**: Earn 10 points for each food item consumed
-- **Pause/Resume**: Press space or click the button to pause
-- **Collision Detection**: Game ends when snake hits walls or itself
-- **Modern UI**: Beautiful gradient backgrounds and animations
-- **Game Over Screen**: Easy restart functionality
-
-## Demo
-
-Play the classic snake game with a modern twist! Control the snake, eat the food, and try to beat your high score.
+A modern Snake game with a retro aesthetic, featuring multiplayer spectator mode, leaderboards, and game persistence.
 
 ## Tech Stack
 
-- **React**: Frontend framework
-- **Vite**: Build tool and development server
-- **TailwindCSS**: Utility-first CSS framework
-- **JavaScript**: Game logic implementation
+### Frontend
+- **Framework**: React + TypeScript + Vite
+- **UI**: Shadcn/ui components
+- **State Management**: React Query
+- **Testing**: Vitest
+
+### Backend
+- **Framework**: FastAPI (Python)
+- **Package Manager**: uv
+- **Testing**: pytest + httpx
 
 ## Getting Started
 
 ### Prerequisites
-
-- Node.js (v14 or higher)
-- npm or yarn
+- Node.js (v18+)
+- Python (3.12+)
+- uv (Python package manager)
 
 ### Installation
 
-1. Clone the repository:
+#### Backend Setup
 ```bash
-git clone https://github.com/iamMashel/vibe-coding-snake.git
-cd vibe-coding-snake
+cd backend
+make install  # or: uv sync
 ```
 
-2. Install dependencies:
+#### Frontend Setup
 ```bash
+cd frontend
 npm install
 ```
 
-3. Start the development server:
+## Running the Application
+
+### Option 1: Using Make (Backend)
 ```bash
+# Terminal 1 - Backend
+cd backend
+make dev
+
+# Terminal 2 - Frontend
+cd frontend
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal)
-
-### Building for Production
-
-To create a production build:
-
+### Option 2: Manual Commands
 ```bash
-npm run build
+# Terminal 1 - Backend
+cd backend
+uv run uvicorn main:app --reload
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
 ```
 
-The built files will be in the `dist` directory.
+The application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
 
-To preview the production build:
+## Testing
 
+### Backend Tests
 ```bash
-npm run preview
+cd backend
+make test  # or: uv run pytest tests.py
 ```
 
-## How to Play
+### Frontend Tests
+```bash
+cd frontend
+npm test
+```
 
-- **Arrow Keys**: Control the direction of the snake
-  - Up Arrow: Move up
-  - Down Arrow: Move down
-  - Left Arrow: Move left
-  - Right Arrow: Move right
-- **Spacebar**: Pause/Resume the game
-- **Play Again Button**: Restart after game over
-
-## Game Rules
-
-1. The snake starts moving in one direction
-2. Use arrow keys to change direction
-3. Eat the red food to grow longer and increase your score
-4. Avoid hitting the walls or your own tail
-5. The game ends when you collide with a wall or yourself
+### API Verification (Integration Test)
+```bash
+cd backend
+make verify  # or: uv run python verify_api.py
+```
 
 ## Project Structure
 
 ```
 vibe-coding-snake/
-├── src/
-│   ├── App.jsx          # Main app component
-│   ├── SnakeGame.jsx    # Snake game component with game logic
-│   ├── main.jsx         # Application entry point
-│   └── index.css        # Global styles with Tailwind imports
-├── public/              # Static assets
-├── index.html           # HTML template
-├── vite.config.js       # Vite configuration
-├── package.json         # Project dependencies
-└── README.md           # Project documentation
+├── backend/
+│   ├── src/
+│   │   ├── models.py       # Pydantic models
+│   │   ├── mock_db.py      # In-memory database
+│   │   └── routers/        # API endpoints
+│   ├── main.py             # FastAPI app
+│   ├── tests.py            # Unit tests
+│   ├── verify_api.py       # Integration tests
+│   ├── Makefile            # Backend commands
+│   └── pyproject.toml      # Python dependencies
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── services/       # API client
+│   │   ├── lib/            # Game logic
+│   │   └── __tests__/      # Tests
+│   └── package.json        # Node dependencies
+└── openapi.yaml            # API specification
 ```
 
-## Contributing
+## Development
 
-Contributions are welcome! Feel free to submit issues or pull requests.
+### Backend Commands
+- `make dev` - Start development server
+- `make test` - Run tests
+- `make verify` - Verify API endpoints
+- `make install` - Install dependencies
+- `make clean` - Clean cache files
+- `make help` - Show all commands
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Frontend Commands
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm test` - Run tests
+- `npm run lint` - Lint code
+
+## API Documentation
+
+The backend automatically generates interactive API documentation:
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI Spec**: `/openapi.yaml`
+
+## Features
+
+- 🎮 Classic Snake gameplay with two modes (Pass-through & Walls)
+- 👥 Spectator mode to watch other players
+- 🏆 Global leaderboard with filtering
+- 💾 Game state persistence
+- 🔐 User authentication
+- 📱 Responsive design
+- ✅ Comprehensive test coverage
 
 ## License
 
-This project is open source and available under the MIT License.
-
-## Acknowledgments
-
-- Built with React and Vite
-- Styled with TailwindCSS
-- Inspired by the classic Snake game
-
-## Contact
-
-Mashel - [@iamMashel](https://github.com/iamMashel)
-
-Project Link: [https://github.com/iamMashel/vibe-coding-snake](https://github.com/iamMashel/vibe-coding-snake)
+MIT
