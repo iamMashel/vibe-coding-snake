@@ -22,7 +22,7 @@ function GamePage() {
               {/* Game Board - Constrained height to prevent scrolling */}
               <div className="order-1 w-full max-w-[65vh] shrink-0">
                 <div className="aspect-square w-full shadow-2xl rounded-xl overflow-hidden border border-primary/20 bg-card/10 backdrop-blur-sm relative">
-                  <GameBoard gameState={game.gameState} />
+                  <GameBoard gameState={game.gameState} finalScore={game.finalScore} />
                 </div>
               </div>
 

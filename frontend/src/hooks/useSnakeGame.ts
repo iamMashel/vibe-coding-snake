@@ -31,18 +31,32 @@ export function useSnakeGame(initialMode: GameMode = 'pass-through'): UseSnakeGa
   // Submit score when game ends
   useEffect(() => {
     const submitScore = async () => {
+      console.log('Check submit score:', {
+        status: gameState.status,
+        prev: previousStatusRef.current,
+        user: user?.username,
+        score: gameState.score
+      });
+
       if (
         gameState.status === 'game-over' &&
         previousStatusRef.current === 'playing' &&
-        user &&
-        gameState.score > 0
+        user
       ) {
+        const finalScore = getFinalScore(gameState);
+        console.log('Submitting score...', {
+          rawScore: gameState.score,
+          finalScore,
+          mode: gameState.mode
+        });
+
         try {
-          await leaderboardApi.submitScore(
-            getFinalScore(gameState),
+          const result = await leaderboardApi.submitScore(
+            finalScore,
             gameState.mode,
             user.username
           );
+          console.log('Score submitted result:', result);
         } catch (error) {
           console.error('Failed to submit score:', error);
         }
