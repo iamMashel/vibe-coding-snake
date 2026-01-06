@@ -1,14 +1,10 @@
 services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    restart: always
-
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "80:8000"
     environment:
       - DATABASE_URL=postgresql://snake_user:snake_pass@db:5432/snake_db
     depends_on:
@@ -25,7 +21,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U snake_user -d snake_db"]
+      test: [ "CMD-SHELL", "pg_isready -U snake_user -d snake_db" ]
       interval: 5s
       timeout: 5s
       retries: 5

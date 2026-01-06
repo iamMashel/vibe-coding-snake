@@ -1,3 +1,12 @@
+# Build frontend
+FROM node:20-alpine as frontend_build
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ .
+RUN npm run build
+
+# Build backend
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 WORKDIR /app
@@ -6,13 +15,16 @@ WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1
 
 # Copy project definition
-COPY pyproject.toml uv.lock ./
+COPY backend/pyproject.toml backend/uv.lock ./
 
 # Install dependencies
 RUN uv sync --frozen --no-install-project
 
 # Copy project source
-COPY . .
+COPY backend/ .
+
+# Copy frontend static files
+COPY --from=frontend_build /app/frontend/dist /app/static
 
 # Install project
 RUN uv sync --frozen
