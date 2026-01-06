@@ -7,7 +7,7 @@ import {
   getFinalScore,
   OPPOSITE_DIRECTIONS,
 } from '@/lib/gameLogic';
-import { useAuth } from './useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { leaderboardApi } from '@/services/api';
 
 interface UseSnakeGameReturn {
@@ -25,7 +25,7 @@ export function useSnakeGame(initialMode: GameMode = 'pass-through'): UseSnakeGa
   const [gameState, setGameState] = useState<GameState>(() => createInitialState(initialMode));
   const gameLoopRef = useRef<number | null>(null);
   const directionQueueRef = useRef<Direction[]>([]);
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const previousStatusRef = useRef<GameState['status']>('idle');
 
   // Submit score when game ends
