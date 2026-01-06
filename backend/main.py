@@ -30,18 +30,19 @@ app.include_router(game.router, prefix="/api")
 async def health_check():
     return {"status": "ok"}
 
-# Mount static files
-app.mount("/assets", StaticFiles(directory="/app/static/assets"), name="assets")
+# Mount static files (only if they exist, e.g. in Docker)
+if os.path.exists("/app/static"):
+    app.mount("/assets", StaticFiles(directory="/app/static/assets"), name="assets")
 
-@app.get("/")
-async def serve_root():
-    return FileResponse("/app/static/index.html")
+    @app.get("/")
+    async def serve_root():
+        return FileResponse("/app/static/index.html")
 
-@app.get("/{full_path:path}")
-async def serve_spa(full_path: str):
-    # Allow API routes to pass through (though they should be caught by routers above)
-    if full_path.startswith("api/"):
-            return {"error": "Not found"}
-            
-    # Serve index.html for all other routes (SPA)
-    return FileResponse("/app/static/index.html")
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # Allow API routes to pass through (though they should be caught by routers above)
+        if full_path.startswith("api/"):
+                return {"error": "Not found"}
+                
+        # Serve index.html for all other routes (SPA)
+        return FileResponse("/app/static/index.html")
