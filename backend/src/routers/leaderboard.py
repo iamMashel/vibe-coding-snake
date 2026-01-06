@@ -37,8 +37,10 @@ async def submit_score(
     username: str = Body(...),
     db: Session = Depends(get_db)
 ):
+    print(f"DEBUG: Submitting score {score} for username '{username}' mode {mode}", flush=True)
     user = db.query(DBUser).filter(DBUser.username == username).first()
     if not user:
+        print(f"DEBUG: User '{username}' not found in DB", flush=True)
         raise HTTPException(status_code=404, detail="User not found")
         
     new_score = Score(
