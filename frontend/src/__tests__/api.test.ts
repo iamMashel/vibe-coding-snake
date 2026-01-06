@@ -34,7 +34,7 @@ describe('API Service', () => {
 
       expect(response.success).toBe(true);
       expect(response.data).toEqual(mockUser);
-      expect(localStorage.getItem('snake_game_session')).toBeTruthy();
+      expect(localStorage.getItem('snake_game_session_v2')).toBeTruthy();
       expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/api/auth/login', expect.any(Object));
     });
 
