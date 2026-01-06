@@ -15,7 +15,7 @@ const Cell = memo(({ isSnakeHead, isSnakeBody, isFood }: {
 }) => {
   if (isSnakeHead) {
     return (
-      <div className="w-full h-full rounded-sm snake-segment relative">
+      <div className="w-full h-full rounded-sm snake-segment relative scale-90">
         <div className="absolute inset-0.5 bg-primary/30 rounded-sm" />
       </div>
     );
@@ -23,14 +23,14 @@ const Cell = memo(({ isSnakeHead, isSnakeBody, isFood }: {
 
   if (isSnakeBody) {
     return (
-      <div className="w-full h-full rounded-sm snake-segment opacity-80" />
+      <div className="w-full h-full rounded-sm snake-segment opacity-80 scale-90" />
     );
   }
 
   if (isFood) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <div className="w-3/4 h-3/4 rounded-full food-item" />
+        <div className="w-[60%] h-[60%] rounded-full food-item" />
       </div>
     );
   }
@@ -59,7 +59,7 @@ export const GameBoard = memo(({ gameState, isSpectator = false, finalScore = 0 
       const isFood = food.x === x && food.y === y;
 
       cells.push(
-        <div key={key} className="aspect-square">
+        <div key={key} className="aspect-square bg-grid-bg">
           <Cell
             isSnakeHead={isSnakeHead}
             isSnakeBody={isSnakeBody}
@@ -80,7 +80,7 @@ export const GameBoard = memo(({ gameState, isSpectator = false, finalScore = 0 
 
       {/* Grid */}
       <div
-        className="game-grid bg-grid-bg p-1"
+        className="game-grid bg-grid-line p-1"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
