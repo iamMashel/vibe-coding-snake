@@ -30,6 +30,25 @@ class User(BaseModel):
     avatarUrl: Optional[str] = None
     createdAt: datetime
 
+class UserInDB(BaseModel):
+    """Internal user model with password hash (not exposed via API)"""
+    id: str
+    username: str
+    email: EmailStr
+    password_hash: str
+    avatarUrl: Optional[str] = None
+    createdAt: datetime
+    
+    def to_user(self) -> User:
+        """Convert to public User model without password"""
+        return User(
+            id=self.id,
+            username=self.username,
+            email=self.email,
+            avatarUrl=self.avatarUrl,
+            createdAt=self.createdAt
+        )
+
 class LoginCredentials(BaseModel):
     email: EmailStr
     password: str

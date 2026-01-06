@@ -1,13 +1,41 @@
 from typing import List, Optional
 from datetime import datetime
-from .models import User, LeaderboardEntry, GameState, ActivePlayer, GameMode
+from .models import User, UserInDB, LeaderboardEntry, GameState, ActivePlayer, GameMode
+import bcrypt
+
+def hash_password(password: str) -> str:
+    """Hash a password using bcrypt"""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against its hash"""
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 class MockDB:
     def __init__(self):
-        self.users: List[User] = [
-            User(id='1', username='SnakeMaster', email='snake@master.com', createdAt=datetime(2024, 1, 1)),
-            User(id='2', username='RetroGamer', email='retro@gamer.com', createdAt=datetime(2024, 1, 5)),
-            User(id='3', username='NeonViper', email='neon@viper.com', createdAt=datetime(2024, 1, 10)),
+        # Mock users with hashed passwords (all use password: "password123")
+        self.users: List[UserInDB] = [
+            UserInDB(
+                id='1', 
+                username='SnakeMaster', 
+                email='snake@master.com',
+                password_hash=hash_password('password123'),
+                createdAt=datetime(2024, 1, 1)
+            ),
+            UserInDB(
+                id='2', 
+                username='RetroGamer', 
+                email='retro@gamer.com',
+                password_hash=hash_password('password123'),
+                createdAt=datetime(2024, 1, 5)
+            ),
+            UserInDB(
+                id='3', 
+                username='NeonViper', 
+                email='neon@viper.com',
+                password_hash=hash_password('password123'),
+                createdAt=datetime(2024, 1, 10)
+            ),
         ]
         
         self.leaderboard: List[LeaderboardEntry] = [
@@ -20,17 +48,18 @@ class MockDB:
         self.saved_games = {} # user_id -> GameState
         self.active_players: List[ActivePlayer] = []
 
-    def get_user_by_email(self, email: str) -> Optional[User]:
+    def get_user_by_email(self, email: str) -> Optional[UserInDB]:
         return next((u for u in self.users if u.email == email), None)
 
-    def get_user_by_username(self, username: str) -> Optional[User]:
+    def get_user_by_username(self, username: str) -> Optional[UserInDB]:
         return next((u for u in self.users if u.username == username), None)
 
-    def create_user(self, username: str, email: str) -> User:
-        user = User(
+    def create_user(self, username: str, email: str, password: str) -> UserInDB:
+        user = UserInDB(
             id=str(len(self.users) + 1),
             username=username,
             email=email,
+            password_hash=hash_password(password),
             createdAt=datetime.now()
         )
         self.users.append(user)

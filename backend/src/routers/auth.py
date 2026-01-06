@@ -1,24 +1,25 @@
 from fastapi import APIRouter, HTTPException, Depends
 from uuid import uuid4
 from ..models import LoginCredentials, SignupCredentials, User, ApiResponse
-from ..mock_db import db
+from ..mock_db import db, verify_password
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=ApiResponse)
 async def login(credentials: LoginCredentials):
-    user = db.get_user_by_email(credentials.email)
-    if not user:
-         raise HTTPException(status_code=401, detail="Invalid credentials")
+    user_in_db = db.get_user_by_email(credentials.email)
+    if not user_in_db:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # In a real app we'd verify password hash
-    if len(credentials.password) < 6:
+    # Verify password using bcrypt
+    if not verify_password(credentials.password, user_in_db.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
         
     token = str(uuid4())
-    db.sessions[token] = user.id
+    db.sessions[token] = user_in_db.id
     
-    return ApiResponse(success=True, data=user)
+    # Return public User model without password
+    return ApiResponse(success=True, data=user_in_db.to_user())
 
 @router.post("/signup", response_model=ApiResponse)
 async def signup(credentials: SignupCredentials):
@@ -28,11 +29,12 @@ async def signup(credentials: SignupCredentials):
     if db.get_user_by_username(credentials.username):
         raise HTTPException(status_code=400, detail="Username already taken")
         
-    user = db.create_user(credentials.username, credentials.email)
+    user_in_db = db.create_user(credentials.username, credentials.email, credentials.password)
     token = str(uuid4())
-    db.sessions[token] = user.id
+    db.sessions[token] = user_in_db.id
     
-    return ApiResponse(success=True, data=user)
+    # Return public User model without password
+    return ApiResponse(success=True, data=user_in_db.to_user())
 
 @router.post("/logout", response_model=ApiResponse)
 async def logout():
