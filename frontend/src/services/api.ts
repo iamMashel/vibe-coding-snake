@@ -41,7 +41,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 }
 
 // Session storage key
-const SESSION_KEY = 'snake_game_session';
+const SESSION_KEY = 'snake_game_session_v2';
 
 // ============ Auth API ============
 
