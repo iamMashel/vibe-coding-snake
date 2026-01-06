@@ -156,6 +156,10 @@ The easiest way to deploy this application is using Render.
 
 Once deployed, your application will be available at your Render URL.
 
+## Author
+
+**Mashel Odera**
+
 ## License
 
 MIT
