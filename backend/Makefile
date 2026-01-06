@@ -12,7 +12,7 @@ dev:
 	uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 test:
-	uv run pytest tests.py -v
+	uv run pytest tests_integration/ -v
 
 verify:
 	uv run python verify_api.py

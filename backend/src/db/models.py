@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from .database import Base
 from ..models import GameMode
 
@@ -16,7 +16,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     avatar_url = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     scores = relationship("Score", back_populates="user")
 
@@ -27,6 +27,6 @@ class Score(Base):
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     score = Column(Integer, nullable=False)
     mode = Column(String, nullable=False)  # Storing Enum as string
-    played_at = Column(DateTime, default=datetime.utcnow)
+    played_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="scores")
