@@ -12,22 +12,22 @@ function GamePage() {
   const game = useSnakeGame('pass-through');
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden relative">
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="container mx-auto px-4 py-4">
+      <main className="flex-1 flex flex-col justify-center min-h-0 container mx-auto px-4">
         {activeTab === 'play' && (
-          <div className="animate-fade-in">
-            <div className="grid lg:grid-cols-[1fr_300px] gap-6 max-w-5xl mx-auto">
-              {/* Game Board */}
-              <div className="order-1">
-                <div className="aspect-square max-w-md mx-auto lg:max-w-none">
+          <div className="w-full flex justify-center items-center h-full">
+            <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start justify-center w-full max-w-5xl">
+              {/* Game Board - Constrained height to prevent scrolling */}
+              <div className="order-1 w-full max-w-[65vh] shrink-0">
+                <div className="aspect-square w-full shadow-2xl rounded-xl overflow-hidden border border-primary/20 bg-card/10 backdrop-blur-sm relative">
                   <GameBoard gameState={game.gameState} />
                 </div>
               </div>
 
               {/* Controls Sidebar */}
-              <div className="order-2">
+              <div className="order-2 w-full max-w-sm lg:w-[300px]">
                 <GameControls
                   gameState={game.gameState}
                   onStart={game.startGame}
@@ -44,22 +44,21 @@ function GamePage() {
         )}
 
         {activeTab === 'leaderboard' && (
-          <div className="max-w-2xl mx-auto animate-fade-in">
+          <div className="max-w-2xl mx-auto w-full h-[calc(100%-2rem)] overflow-y-auto pr-2">
             <Leaderboard />
           </div>
         )}
 
         {activeTab === 'spectate' && (
-          <div className="max-w-2xl mx-auto animate-fade-in">
+          <div className="max-w-2xl mx-auto w-full h-[calc(100%-2rem)] overflow-y-auto pr-2">
             <SpectatorView />
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-8 py-4 text-center text-sm text-muted-foreground">
+      <footer className="py-2 text-center text-xs text-muted-foreground bg-background/80 backdrop-blur-sm border-t border-border mt-auto">
         <p className="font-display">SNAKE GAME</p>
-        <p className="text-xs mt-1">Built with ❤️ for multiplayer fun</p>
       </footer>
     </div>
   );

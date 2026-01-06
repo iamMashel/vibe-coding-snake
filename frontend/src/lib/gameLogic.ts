@@ -5,7 +5,7 @@
 
 import type { Position, Direction, GameState, GameMode } from '@/types';
 
-export const GRID_SIZE = 15;
+export const GRID_SIZE = 20;
 export const INITIAL_SPEED = 150;
 export const SPEED_INCREMENT = 5;
 export const MIN_SPEED = 50;
