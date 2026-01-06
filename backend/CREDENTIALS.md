@@ -1,18 +1,10 @@
-# Mock User Credentials
+# Test Credentials
 
-All mock users use the password: **`password123`**
+The database has been migrated to SQLite/PostgreSQL.
+Previous mock users have been removed.
 
-## Available Mock Users
+Please **Sign Up** via the frontend to create a new account.
 
-| Username | Email | Password |
-|----------|-------|----------|
-| SnakeMaster | snake@master.com | password123 |
-| RetroGamer | retro@gamer.com | password123 |
-| NeonViper | neon@viper.com | password123 |
-
-## Password Security
-
-- Passwords are hashed using **bcrypt** with salt
-- Password hashes are stored in `UserInDB` model (internal only)
-- Public `User` model never exposes password hashes
-- Minimum password length: 6 characters (enforced by frontend validation)
+You can use the following credentials AFTER signing up manually:
+- **Email:** `snake@example.com`
+- **Password:** `password123`

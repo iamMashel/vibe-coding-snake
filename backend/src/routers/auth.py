@@ -1,48 +1,61 @@
 from fastapi import APIRouter, HTTPException, Depends
-from uuid import uuid4
+from sqlalchemy.orm import Session
+from ..db.database import get_db
+from ..db.models import User as DBUser
 from ..models import LoginCredentials, SignupCredentials, User, ApiResponse
-from ..mock_db import db, verify_password
+from ..security import verify_password, get_password_hash
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
+def to_pydantic_user(db_user: DBUser) -> User:
+    return User(
+        id=str(db_user.id),
+        username=db_user.username,
+        email=db_user.email,
+        avatarUrl=db_user.avatar_url,
+        createdAt=db_user.created_at
+    )
+
 @router.post("/login", response_model=ApiResponse)
-async def login(credentials: LoginCredentials):
-    user_in_db = db.get_user_by_email(credentials.email)
+async def login(credentials: LoginCredentials, db: Session = Depends(get_db)):
+    user_in_db = db.query(DBUser).filter(DBUser.email == credentials.email).first()
+    
     if not user_in_db:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Verify password using bcrypt
     if not verify_password(credentials.password, user_in_db.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-        
-    token = str(uuid4())
-    db.sessions[token] = user_in_db.id
     
-    # Return public User model without password
-    return ApiResponse(success=True, data=user_in_db.to_user())
+    # In a real app we'd define a session/token here
+    
+    return ApiResponse(success=True, data=to_pydantic_user(user_in_db))
 
 @router.post("/signup", response_model=ApiResponse)
-async def signup(credentials: SignupCredentials):
-    if db.get_user_by_email(credentials.email):
+async def signup(credentials: SignupCredentials, db: Session = Depends(get_db)):
+    if db.query(DBUser).filter(DBUser.email == credentials.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
         
-    if db.get_user_by_username(credentials.username):
+    if db.query(DBUser).filter(DBUser.username == credentials.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
-        
-    user_in_db = db.create_user(credentials.username, credentials.email, credentials.password)
-    token = str(uuid4())
-    db.sessions[token] = user_in_db.id
     
-    # Return public User model without password
-    return ApiResponse(success=True, data=user_in_db.to_user())
+    hashed_password = get_password_hash(credentials.password)
+    
+    new_user = DBUser(
+        username=credentials.username,
+        email=credentials.email,
+        password_hash=hashed_password
+    )
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    return ApiResponse(success=True, data=to_pydantic_user(new_user))
 
 @router.post("/logout", response_model=ApiResponse)
 async def logout():
-    # In a real app we'd need the token from cookies/headers
     return ApiResponse(success=True)
 
 @router.get("/session", response_model=ApiResponse)
 async def get_session():
-    # Mock always returning first user for now if we can't accept cookies comfortably in this mock
-    # For a real implementation we would parse the cookie
-    return ApiResponse(success=True, data=None) # Start with no session
+    return ApiResponse(success=True, data=None)

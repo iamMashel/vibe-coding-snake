@@ -1,23 +1,32 @@
 from typing import Optional, List
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Depends, HTTPException
+from sqlalchemy.orm import Session
+from ..db.database import get_db
+from ..db.models import Score, User as DBUser
 from ..models import ApiResponse, LeaderboardEntry, GameMode
-from ..mock_db import db
 
 router = APIRouter(prefix="/leaderboard", tags=["Leaderboard"])
 
 @router.get("/", response_model=ApiResponse)
-async def get_leaderboard(mode: Optional[GameMode] = None):
-    entries = db.leaderboard
+async def get_leaderboard(mode: Optional[GameMode] = None, db: Session = Depends(get_db)):
+    query = db.query(Score).join(DBUser)
+    
     if mode:
-        entries = [e for e in entries if e.mode == mode]
+        query = query.filter(Score.mode == mode.value)
         
-    # Recalculate ranks for the filtered view
+    # Get top 50 scores
+    scores = query.order_by(Score.score.desc()).limit(50).all()
+    
     entries_with_rank = []
-    for i, e in enumerate(entries):
-        # We need to create a copy to not mutate the original db
-        entry_copy = e.model_copy()
-        entry_copy.rank = i + 1
-        entries_with_rank.append(entry_copy)
+    for i, s in enumerate(scores):
+        entries_with_rank.append(LeaderboardEntry(
+            id=s.id,
+            rank=i + 1,
+            username=s.user.username,
+            score=s.score,
+            mode=GameMode(s.mode) if s.mode else GameMode.PASS_THROUGH,
+            playedAt=s.played_at
+        ))
         
     return ApiResponse(success=True, data=entries_with_rank)
 
@@ -25,7 +34,34 @@ async def get_leaderboard(mode: Optional[GameMode] = None):
 async def submit_score(
     score: int = Body(...), 
     mode: GameMode = Body(...), 
-    username: str = Body(...)
+    username: str = Body(...),
+    db: Session = Depends(get_db)
 ):
-    entry = db.add_score(username, score, mode)
+    user = db.query(DBUser).filter(DBUser.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    new_score = Score(
+        user_id=user.id,
+        score=score,
+        mode=mode.value
+    )
+    
+    db.add(new_score)
+    db.commit()
+    db.refresh(new_score)
+    
+    # We need to calculate rank to return the full entry
+    # For simplicity in this response, we'll just return the entry details
+    # Ideally we'd query for the rank
+    
+    entry = LeaderboardEntry(
+        id=new_score.id,
+        rank=0, # Placeholder rank
+        username=user.username,
+        score=new_score.score,
+        mode=mode,
+        playedAt=new_score.played_at
+    )
+    
     return ApiResponse(success=True, data=entry)
