@@ -7,6 +7,8 @@ import {
   getFinalScore,
   OPPOSITE_DIRECTIONS,
 } from '@/lib/gameLogic';
+import { useAuth } from './useAuth';
+import { leaderboardApi } from '@/services/api';
 
 interface UseSnakeGameReturn {
   gameState: GameState;
@@ -23,11 +25,38 @@ export function useSnakeGame(initialMode: GameMode = 'pass-through'): UseSnakeGa
   const [gameState, setGameState] = useState<GameState>(() => createInitialState(initialMode));
   const gameLoopRef = useRef<number | null>(null);
   const directionQueueRef = useRef<Direction[]>([]);
+  const { user } = useAuth();
+  const previousStatusRef = useRef<GameState['status']>('idle');
+
+  // Submit score when game ends
+  useEffect(() => {
+    const submitScore = async () => {
+      if (
+        gameState.status === 'game-over' &&
+        previousStatusRef.current === 'playing' &&
+        user &&
+        gameState.score > 0
+      ) {
+        try {
+          await leaderboardApi.submitScore(
+            getFinalScore(gameState),
+            gameState.mode,
+            user.username
+          );
+        } catch (error) {
+          console.error('Failed to submit score:', error);
+        }
+      }
+      previousStatusRef.current = gameState.status;
+    };
+
+    submitScore();
+  }, [gameState.status, gameState.score, gameState.mode, user]);
 
   // Process direction queue to handle rapid inputs
   const processDirectionQueue = useCallback(() => {
     if (directionQueueRef.current.length === 0) return;
-    
+
     setGameState(prev => {
       let newState = prev;
       while (directionQueueRef.current.length > 0) {
