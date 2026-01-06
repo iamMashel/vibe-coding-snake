@@ -141,6 +141,21 @@ The backend automatically generates interactive API documentation:
 - 📱 Responsive design
 - ✅ Comprehensive test coverage
 
+## Deployment
+
+### Deploy to Render
+The easiest way to deploy this application is using Render.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+1. Click the button above.
+2. Connect your GitHub repository.
+3. Render will automatically detect the `render.yaml` blueprint and set up:
+   - PostgreSQL Database
+   - Web Service (Frontend + Backend)
+
+Once deployed, your application will be available at your Render URL.
+
 ## License
 
 MIT
