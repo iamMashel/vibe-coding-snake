@@ -5,7 +5,7 @@
 
 import type { Position, Direction, GameState, GameMode } from '@/types';
 
-export const GRID_SIZE = 20;
+export const GRID_SIZE = 15;
 export const INITIAL_SPEED = 150;
 export const SPEED_INCREMENT = 5;
 export const MIN_SPEED = 50;
@@ -32,7 +32,7 @@ export const OPPOSITE_DIRECTIONS: Record<Direction, Direction> = {
 export function createInitialState(mode: GameMode): GameState {
   const centerX = Math.floor(GRID_SIZE / 2);
   const centerY = Math.floor(GRID_SIZE / 2);
-  
+
   return {
     snake: [
       { x: centerX, y: centerY },
@@ -57,7 +57,7 @@ export function createInitialState(mode: GameMode): GameState {
  */
 export function generateFood(snake: Position[]): Position {
   const occupied = new Set(snake.map(p => `${p.x},${p.y}`));
-  
+
   let food: Position;
   do {
     food = {
@@ -65,7 +65,7 @@ export function generateFood(snake: Position[]): Position {
       y: Math.floor(Math.random() * GRID_SIZE),
     };
   } while (occupied.has(`${food.x},${food.y}`));
-  
+
   return food;
 }
 
@@ -76,13 +76,13 @@ export function getNextHeadPosition(head: Position, direction: Direction, mode: 
   const delta = DIRECTION_VECTORS[direction];
   let newX = head.x + delta.x;
   let newY = head.y + delta.y;
-  
+
   if (mode === 'pass-through') {
     // Wrap around edges
     newX = (newX + GRID_SIZE) % GRID_SIZE;
     newY = (newY + GRID_SIZE) % GRID_SIZE;
   }
-  
+
   return { x: newX, y: newY };
 }
 
@@ -123,31 +123,31 @@ export function moveSnake(state: GameState): GameState {
   if (state.status !== 'playing') {
     return state;
   }
-  
+
   const head = state.snake[0];
   const newHead = getNextHeadPosition(head, state.direction, state.mode);
-  
+
   // Check wall collision in 'walls' mode
   if (state.mode === 'walls' && isOutOfBounds(newHead)) {
     return { ...state, status: 'game-over' };
   }
-  
+
   // Create new snake with new head
   const newSnake = [newHead, ...state.snake];
-  
+
   // Check self collision (before removing tail)
   if (checkSelfCollision(newSnake.slice(0, -1))) {
     return { ...state, status: 'game-over' };
   }
-  
+
   // Check food collision
   const ateFood = checkFoodCollision(newHead, state.food);
-  
+
   if (ateFood) {
     // Don't remove tail, generate new food
     const newFood = generateFood(newSnake);
     const newSpeed = Math.max(MIN_SPEED, state.speed - SPEED_INCREMENT);
-    
+
     return {
       ...state,
       snake: newSnake,
@@ -172,7 +172,7 @@ export function changeDirection(state: GameState, newDirection: Direction): Game
   if (!isValidDirectionChange(state.direction, newDirection)) {
     return state;
   }
-  
+
   return { ...state, direction: newDirection };
 }
 

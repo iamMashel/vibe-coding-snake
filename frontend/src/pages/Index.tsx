@@ -21,7 +21,7 @@ function GamePage() {
             <div className="grid lg:grid-cols-[1fr_300px] gap-6 max-w-5xl mx-auto">
               {/* Game Board */}
               <div className="order-1">
-                <div className="aspect-square max-w-lg mx-auto lg:max-w-none">
+                <div className="aspect-square max-w-md mx-auto lg:max-w-none">
                   <GameBoard gameState={game.gameState} />
                 </div>
               </div>
