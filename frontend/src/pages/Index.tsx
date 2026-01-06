@@ -14,18 +14,18 @@ function GamePage() {
   return (
     <div className="min-h-screen bg-background">
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      <main className="container mx-auto px-4 py-8">
+
+      <main className="container mx-auto px-4 py-4">
         {activeTab === 'play' && (
           <div className="animate-fade-in">
-            <div className="grid lg:grid-cols-[1fr_300px] gap-8 max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-[1fr_300px] gap-6 max-w-5xl mx-auto">
               {/* Game Board */}
               <div className="order-1">
                 <div className="aspect-square max-w-lg mx-auto lg:max-w-none">
                   <GameBoard gameState={game.gameState} />
                 </div>
               </div>
-              
+
               {/* Controls Sidebar */}
               <div className="order-2">
                 <GameControls
@@ -57,7 +57,7 @@ function GamePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-16 py-6 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border mt-8 py-4 text-center text-sm text-muted-foreground">
         <p className="font-display">SNAKE GAME</p>
         <p className="text-xs mt-1">Built with ❤️ for multiplayer fun</p>
       </footer>

@@ -28,7 +28,7 @@ export function GameControls({
   const { status, mode, score } = gameState;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Score Display */}
       <div className="bg-card rounded-lg p-4 neon-box-secondary">
         <div className="text-center">
@@ -70,8 +70,8 @@ export function GameControls({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          {mode === 'pass-through' 
-            ? 'Snake wraps around edges' 
+          {mode === 'pass-through'
+            ? 'Snake wraps around edges'
             : 'Hit a wall = Game Over (1.5x score)'}
         </p>
       </div>
@@ -79,8 +79,8 @@ export function GameControls({
       {/* Game Controls */}
       <div className="space-y-2">
         {status === 'idle' && (
-          <Button 
-            onClick={onStart} 
+          <Button
+            onClick={onStart}
             className="w-full font-display arcade-button neon-box"
             size="lg"
           >
@@ -88,10 +88,10 @@ export function GameControls({
             Start Game
           </Button>
         )}
-        
+
         {status === 'playing' && (
-          <Button 
-            onClick={onPause} 
+          <Button
+            onClick={onPause}
             variant="secondary"
             className="w-full font-display arcade-button neon-box-secondary"
             size="lg"
@@ -100,10 +100,10 @@ export function GameControls({
             Pause
           </Button>
         )}
-        
+
         {status === 'paused' && (
-          <Button 
-            onClick={onResume} 
+          <Button
+            onClick={onResume}
             className="w-full font-display arcade-button neon-box"
             size="lg"
           >
@@ -111,10 +111,10 @@ export function GameControls({
             Resume
           </Button>
         )}
-        
+
         {(status === 'game-over' || status === 'paused') && (
-          <Button 
-            onClick={onReset} 
+          <Button
+            onClick={onReset}
             variant="outline"
             className="w-full font-display"
           >
@@ -129,8 +129,8 @@ export function GameControls({
         <p className="text-sm text-muted-foreground mb-3 text-center">Touch Controls</p>
         <div className="grid grid-cols-3 gap-2 max-w-[180px] mx-auto">
           <div />
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="icon"
             onClick={() => onDirectionChange('UP')}
             disabled={status !== 'playing'}
@@ -139,9 +139,9 @@ export function GameControls({
             <ArrowUp className="w-5 h-5" />
           </Button>
           <div />
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             size="icon"
             onClick={() => onDirectionChange('LEFT')}
             disabled={status !== 'playing'}
@@ -150,8 +150,8 @@ export function GameControls({
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div />
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="icon"
             onClick={() => onDirectionChange('RIGHT')}
             disabled={status !== 'playing'}
@@ -159,10 +159,10 @@ export function GameControls({
           >
             <ArrowRight className="w-5 h-5" />
           </Button>
-          
+
           <div />
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="icon"
             onClick={() => onDirectionChange('DOWN')}
             disabled={status !== 'playing'}
@@ -175,8 +175,10 @@ export function GameControls({
       </div>
 
       {/* Keyboard hints */}
-      <div className="hidden md:block text-center text-xs text-muted-foreground">
-        <p>Use Arrow Keys or WASD to move</p>
+      <div className="hidden md:block text-center text-xs text-muted-foreground space-y-1">
+        <p className="font-medium">Controls:</p>
+        <p>Arrow Keys or WASD to move</p>
+        <p>Space to pause • R to restart</p>
       </div>
     </div>
   );
