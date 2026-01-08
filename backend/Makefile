@@ -14,6 +14,12 @@ dev:
 test:
 	uv run pytest tests_integration/ -v
 
+test-unit:
+	uv run pytest tests_integration/test_general.py -v
+
+test-integration:
+	uv run pytest tests_integration/test_*_integration.py -v
+
 verify:
 	uv run python verify_api.py
 

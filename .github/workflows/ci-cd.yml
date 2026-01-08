@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Run Tests
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,7 +31,7 @@ jobs:
           cd frontend
           npm test -- --run
 
-      # Backend Tests
+      # Backend Unit Tests
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -45,14 +45,40 @@ jobs:
           cd backend
           make install
 
-      - name: Run Backend Tests
+      - name: Run Backend Unit Tests
         run: |
           cd backend
-          make test
+          make test-unit
+
+  integration-test:
+    name: Run Integration Tests
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          make install
+
+      - name: Run Backend Integration Tests
+        run: |
+          cd backend
+          make test-integration
 
   deploy:
     name: Deploy to Render
-    needs: test
+    needs: [test, integration-test]
     runs-on: ubuntu-latest
     if: success() && github.ref == 'refs/heads/main'
     steps:
